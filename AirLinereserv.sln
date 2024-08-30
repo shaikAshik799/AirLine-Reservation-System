@@ -1,25 +1,515 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34622.214
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirLinereserv", "AirLinereserv\AirLinereserv.csproj", "{6C9DD620-7377-4939-9694-1A9C7201611C}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6C9DD620-7377-4939-9694-1A9C7201611C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C9DD620-7377-4939-9694-1A9C7201611C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C9DD620-7377-4939-9694-1A9C7201611C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C9DD620-7377-4939-9694-1A9C7201611C}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {30BF3B9A-8DB9-42D2-A16C-14F8AEC5369A}
-	EndGlobalSection
-EndGlobal
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Text.RegularExpressions;
+using System.Net.NetworkInformation;
+using System.Numerics;
+public class FlightDatabase
+{
+    public static SortedList<int, string> FlightNo { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> Airports { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> Airlines { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> DepartureCities { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> ArrivalCities { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> TicketRate { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> DepartureTime { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> ArrivalTime { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> DepartureDate { get; } = new SortedList<int, string>();
+    public static SortedList<int, string> ArrivalDate { get; } = new SortedList<int, string>();
+
+}
+
+public class A
+{
+    public A()
+    {
+        FlightDetails();
+    }
+
+    public void FlightDetails() 
+    {
+        int numberOfFlights = GetNumber("flight details");
+
+        for (int f = 1; f <= numberOfFlights; f++)
+        {
+            Console.WriteLine($"\nFlight {f}:");
+            FlightDatabase.FlightNo.Add(f, InputEntity("Flight Number: "));
+            FlightDatabase.Airports.Add(f, InputEntity("Airport Name : "));
+            FlightDatabase.Airlines.Add(f, InputEntity("Airline Name : "));
+            Console.WriteLine("Is the flight domestic or international?");
+            Console.WriteLine("Domestic      ---> 1");
+            Console.WriteLine("International ---> 2");
+            int flightType = GetNumber("flight type");
+            if (flightType == 1)
+            {
+                FlightDatabase.DepartureCities.Add(f, InputEntity("Departure city             : "));
+                FlightDatabase.DepartureDate.Add(f, InputEntity("Departure date (DD/MM/YYYY): "));
+                FlightDatabase.DepartureTime.Add(f, InputTime("Departure Time (HH:MM AM/PM): "));
+                FlightDatabase.ArrivalCities.Add(f, InputEntity("Arrival city               : "));
+                FlightDatabase.ArrivalDate.Add(f, InputEntity("Arrival date (DD/MM/YYYY)  : "));
+                FlightDatabase.ArrivalTime.Add(f, InputTime("Arrival Time(HH:MM AM/PM): "));
+                FlightDatabase.TicketRate.Add(f, InputEntity("Ticket Price For Person    : "));
+            }
+            else if (flightType == 2)
+            {
+                FlightDatabase.DepartureCities.Add(f, InputEntity("Departure country          : "));
+                FlightDatabase.DepartureDate.Add(f, InputEntity("Departure date (DD/MM/YYYY): "));
+                FlightDatabase.DepartureTime.Add(f, InputTime("Departure Time (HH:MM AM/PM): "));
+                FlightDatabase.ArrivalCities.Add(f, InputEntity("Arrival country            : "));
+                FlightDatabase.ArrivalDate.Add(f, InputEntity("Arrival date (DD/MM/YYYY)  : "));
+                FlightDatabase.ArrivalTime.Add(f, InputTime("Arrival Time  (HH:MM AM/PM): "));
+                FlightDatabase.TicketRate.Add(f, InputEntity("Ticket Price For Person    : "));
+            }
+            else
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tInvalid choice. Please enter 1 for domestic or 2 for international.");
+                continue;
+            }
+        }
+        Console.WriteLine("CREATED A 1 FLIGHT DETAILS DATA");
+        Thread.Sleep(2000);
+        Console.Write("\t\t\t\t\t\t\t\tDo you want to increase the ticket price for any flight? (Y/N):");
+        string increasePriceChoice = Console.ReadLine();
+        if (increasePriceChoice.ToUpper() == "Y")
+        {
+            IncreaseTicketPrice();
+        }
+        Console.Write("\t\t\t\t\t\t\t\tDo you want to Update the Flight Details? (Y/N):");
+        Thread.Sleep(1700);
+        string moreDetailsChoice = Console.ReadLine();
+        if (moreDetailsChoice.ToUpper() == "Y")
+        {
+            Console.WriteLine("Now You Can Enter the Flight Details Again");
+            Thread.Sleep(1800);
+            Console.Clear();
+            UpdateFlightDetails();
+        }
+        Console.Write("\t\t\t\t\t\t\t\tDo you want to Delete the Flight Details? (Y/N):");
+        Thread.Sleep(1700);
+        string NomoreDetailsChoice = Console.ReadLine();
+        if (NomoreDetailsChoice.ToUpper() == "Y")
+        {
+            Thread.Sleep(1800);
+            Console.Clear();
+            DeleteFlightDetails();
+        }
+        else
+        {
+            Console.WriteLine("\t\t\t\t\t\t\t\tDo you want to continue as Admin or User?");
+            Console.WriteLine("\t\t\t\t\t\t\t\tAdmin Login ---> 1");
+            Console.WriteLine("\t\t\t\t\t\t\t\tUser Login  ---> 2 ");
+            Console.Write("\t\t\t\t\t\t\t\tEnter your choice: ");
+            int choice = int.Parse(Console.ReadLine());
+            if (choice == 1)
+            {
+                Console.Clear();
+                Program.Main(null);
+            }
+            else if (choice == 2)
+            {
+                Console.Clear();
+                Program.UserLogin();
+            }
+            else
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tInvalid choice.");
+            }
+
+        }
+    }
+
+    public string InputEntity(string entity)
+    {
+        Console.Write($"\t\t\t\t\t\t\t\tEnter {entity}  ");
+        return Console.ReadLine();
+    }
+
+    public string InputTime(string entity)
+    {
+        Console.Write($"\t\t\t\t\t\t\t\tEnter {entity}  ");
+        return Console.ReadLine();
+    }
+
+    public int GetNumber(string entity)
+    {
+        Console.Write($"\t\t\t\t\t\t\t\tEnter number of {entity}: ");
+        return int.Parse(Console.ReadLine());
+    }
+
+    public void IncreaseTicketPrice()
+    {
+        Console.WriteLine("Enter the flight number for which you want to increase the ticket price:");
+        int flightNumber = int.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the new ticket price for this flight:");
+        string newPrice = Console.ReadLine();
+        FlightDatabase.TicketRate[flightNumber] = newPrice;
+        Console.WriteLine($"Ticket price for Flight {flightNumber} has been updated to {newPrice}");
+    }
+    public void PrintFlightDetails(int flightNumber)
+    {
+        Console.WriteLine("\t\t\t\t\t\t\t\tFlight Details : ");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tFlight Number : {FlightDatabase.FlightNo[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tAirport       : {FlightDatabase.Airports[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tAirline       : {FlightDatabase.Airlines[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture City: {FlightDatabase.DepartureCities[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Date: {FlightDatabase.DepartureDate[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Time: {FlightDatabase.DepartureTime[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tArrival City  : {FlightDatabase.ArrivalCities[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tArrival Date  : {FlightDatabase.ArrivalDate[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tArrival Time  : {FlightDatabase.ArrivalTime[flightNumber]}");
+        Console.WriteLine($"\t\t\t\t\t\t\t\tTicket Rate   : {FlightDatabase.TicketRate[flightNumber]}");
+
+    }
+    public void DeleteFlightDetails()
+    {
+        Console.Write("\t\t\t\t\t\t\t\tEnter the Flight Details Number to Delete: ");
+        int flightNumberToDelete;
+        while (!int.TryParse(Console.ReadLine(), out flightNumberToDelete) ||
+               !FlightDatabase.FlightNo.ContainsKey(flightNumberToDelete))
+        {
+            Console.WriteLine("\t\t\t\t\t\t\t\tInvalid input. Please enter a valid flight number.");
+            Console.Write("\t\t\t\t\t\t\t\tEnter the Flight Number to delete: ");
+        }
+        Console.WriteLine("\n\t\t\t\t\t\t\t\tFlight Details Before Deletion:");
+        PrintFlightDetails(flightNumberToDelete);
+        FlightDatabase.FlightNo.Remove(flightNumberToDelete);
+        FlightDatabase.Airports.Remove(flightNumberToDelete);
+        FlightDatabase.Airlines.Remove(flightNumberToDelete);
+        FlightDatabase.DepartureCities.Remove(flightNumberToDelete);
+        FlightDatabase.DepartureDate.Remove(flightNumberToDelete);
+        FlightDatabase.DepartureTime.Remove(flightNumberToDelete);
+        FlightDatabase.ArrivalCities.Remove(flightNumberToDelete);
+        FlightDatabase.ArrivalDate.Remove(flightNumberToDelete);
+        FlightDatabase.ArrivalTime.Remove(flightNumberToDelete);
+        FlightDatabase.TicketRate.Remove(flightNumberToDelete);
+        Thread.Sleep(1800);
+        Console.Clear();
+        Console.WriteLine("\t\t\t\t\t\t\t\tFlight details deleted successfully.");
+        Thread.Sleep(1800);
+        Console.Clear();
+        Console.Write("\t\t\t\t\t\t\t\tDo you want to Update the Flight Details? (Y/N):");
+        Thread.Sleep(1700);
+        string r = Console.ReadLine();
+        if (r.ToUpper() == "Y")
+        {
+            Console.WriteLine("Now You Can Enter the Flight Details Again");
+            Thread.Sleep(1800);
+            Console.Clear();
+
+            FlightDetails();
+        }
+    }
+
+    public void UpdateFlightDetails()
+    {
+        Console.WriteLine("Enter the Flight Details Number you want to update:");
+        int flightNumber = int.Parse(Console.ReadLine());
+
+        if (FlightDatabase.FlightNo.ContainsKey(flightNumber))
+        {
+            Console.WriteLine($"\n\t\t\t\t\t\t\t\tFlight Details Before Update for Flight {flightNumber}:");
+            PrintFlightDetails(flightNumber);
+
+            Console.WriteLine($"\n\t\t\t\t\t\t\t\tEnter updated details for Flight {flightNumber}:");
+            FlightDatabase.Airports[flightNumber] = InputEntity("Airport Name : ");
+            FlightDatabase.Airlines[flightNumber] = InputEntity("Airline Name : ");
+
+            Console.WriteLine("Is the flight domestic or international?");
+            Console.WriteLine("Domestic      ---> 1");
+            Console.WriteLine("International ---> 2");
+            int flightType = GetNumber("flight type");
+            if (flightType == 1)
+            {
+                FlightDatabase.DepartureCities[flightNumber] = InputEntity("Departure city             : ");
+                FlightDatabase.DepartureDate[flightNumber] = InputEntity("Departure date (DD/MM/YYYY): ");
+                FlightDatabase.DepartureTime[flightNumber] = InputTime("Departure Time (HH:MM AM/PM): ");
+                FlightDatabase.ArrivalCities[flightNumber] = InputEntity("Arrival city               : ");
+                FlightDatabase.ArrivalDate[flightNumber] = InputEntity("Arrival date (DD/MM/YYYY)  : ");
+                FlightDatabase.ArrivalTime[flightNumber] = InputTime("Arrival Time(HH:MM AM/PM): ");
+                FlightDatabase.TicketRate[flightNumber] = InputEntity("Ticket Price For Person    : ");
+            }
+            else if (flightType == 2)
+            {
+                FlightDatabase.DepartureCities[flightNumber] = InputEntity("Departure country          : ");
+                FlightDatabase.DepartureDate[flightNumber] = InputEntity("Departure date (DD/MM/YYYY): ");
+                FlightDatabase.DepartureTime[flightNumber] = InputTime("Departure Time (HH:MM AM/PM): ");
+                FlightDatabase.ArrivalCities[flightNumber] = InputEntity("Arrival country            : ");
+                FlightDatabase.ArrivalDate[flightNumber] = InputEntity("Arrival date (DD/MM/YYYY)  : ");
+                FlightDatabase.ArrivalTime[flightNumber] = InputTime("Arrival Time  (HH:MM AM/PM): ");
+                FlightDatabase.TicketRate[flightNumber] = InputEntity("Ticket Price For Person    : ");
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice. Please enter 1 for domestic or 2 for international.");
+            }
+
+            Console.WriteLine($"\n\t\t\t\t\t\t\t\tFlight Details After Update for Flight {flightNumber}:");
+            PrintFlightDetails(flightNumber);
+            return;
+        }
+        else
+        {
+            Console.WriteLine("Flight details not found.");
+        }
+    }
+    public class B
+    {
+        public void AdminFlightDetails()
+        {
+            Console.WriteLine("\n\t\t\t\t\t\t\t\tRETRIEVED DATA OF FLIGHT DETAILS:");
+            if (FlightDatabase.Airports.Count == 0)
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tNo Flight Details available. Exiting program.");
+                Thread.Sleep(1800);
+                Console.WriteLine("\n\t\t\t\t\t\t\t\tPress any key to exit...");
+                Console.ReadKey();
+                Environment.Exit(0);
+
+            }
+            else
+            {
+                for (int i = 0; i < FlightDatabase.Airports.Count; i++)
+                {
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tFlight {i + 1} Details:");
+                    Console.WriteLine();
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tFlight Number          : {FlightDatabase.FlightNo[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tAirport                : {FlightDatabase.Airports[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tAirline                : {FlightDatabase.Airlines[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture              : {FlightDatabase.DepartureCities[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Date         : {FlightDatabase.DepartureDate[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Time         : {FlightDatabase.DepartureTime[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tArrival                : {FlightDatabase.ArrivalCities[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture              : {FlightDatabase.ArrivalDate[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tArrival Time           : {FlightDatabase.ArrivalTime[i + 1]}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\tTicket Price Per Person: {FlightDatabase.TicketRate[i + 1]}");
+                }
+            }
+            Console.Write("\t\t\t\t\t\t\t\tEnter the  Flight Details number  to generate the Ticket: ");
+            int selectedFlightNumber;
+            while (!int.TryParse(Console.ReadLine(), out selectedFlightNumber) || selectedFlightNumber < 1 || selectedFlightNumber > FlightDatabase.Airports.Count)
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tInvalid input. Please enter a valid flight number.");
+                Console.Write("\t\t\t\t\t\t\t\tEnter the number of the flight to generate the ticket: ");
+            }
+            Console.Write("\t\t\t\t\t\t\t\tHow Many Tickets you Need: ");
+            int numberOfTickets = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Is This Trip One-Way ---> 1 \nor\n Round-Trip ---> 2: ");
+            int way = Convert.ToInt32(Console.ReadLine());
+
+            GenerateTicket(selectedFlightNumber, numberOfTickets, way);
+        }
+
+        private void GenerateTicket(int selectedFlightNumber, int numberOfTickets, int way)
+        {
+            string flightno = FlightDatabase.FlightNo[selectedFlightNumber];
+            string airport = FlightDatabase.Airports[selectedFlightNumber];
+            string airline = FlightDatabase.Airlines[selectedFlightNumber];
+            string departureCity = FlightDatabase.DepartureCities[selectedFlightNumber];
+            string departuredate = FlightDatabase.DepartureDate[selectedFlightNumber];
+            string departuretime = FlightDatabase.DepartureTime[selectedFlightNumber];
+            string ticketPrice = FlightDatabase.TicketRate[selectedFlightNumber];
+            string arrivalCity = FlightDatabase.ArrivalCities[selectedFlightNumber];
+            string arrivaldate = FlightDatabase.ArrivalDate[selectedFlightNumber];
+            string arrivaltime = FlightDatabase.ArrivalTime[selectedFlightNumber];
+            int t = Convert.ToInt32(ticketPrice);
+            int totalPrice = t * numberOfTickets;
+            string baggageAllowance = "1 carry-on bag and 1 personal item included Additional baggage may incur extra charges.";
+            string checkInTime = "Check-in opens 3 hours before departure and closes 1 hour before departure.";
+
+            Random random = new Random();
+            int[] seatNumbers = new int[numberOfTickets];
+            for (int i = 0; i < numberOfTickets; i++)
+            {
+                seatNumbers[i] = random.Next(1, 51);
+            }
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("|===============================================================================================================================================");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\t\t\t\t\t\t\t               Flight Ticket                ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("================================================================================================================================================");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\t\t\t\t\t\t\t\tFlight Number :     {flightno}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tAirport       :     {airport}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tAirline       :     {airline}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture     :     {departureCity}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Date:     {departuredate}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tDeparture Time:     {departuretime}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tArrival       :     {arrivalCity}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tArrival Date  :     {arrivaldate}");
+            Console.WriteLine($"\t\t\t\t\t\t\t\tArrival Time  :     {arrivaltime}");
+            if (way == 1)
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tTicket Type    :      ONE-WAY only");
+
+            }
+            else
+            {
+                Console.WriteLine("\t\t\t\t\t\t\t\tTicket Type    :      TWO-WAY ");
+            }
+            Console.WriteLine($"\t\t\t\t\t\t\t\tTotal Price for {numberOfTickets} Tickets:   {totalPrice}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("------------------------------------------------------------------------------------------------------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            for (int i = 0; i < numberOfTickets; i++)
+            {
+                Console.WriteLine($"\t\t\t\t\t\t\t\tTicket {i + 1} - Seat Number: {seatNumbers[i]}");
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("------------------------------------------------------------------------------------------------------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"\t\t\t\t\tBaggage Allowance: {baggageAllowance}");
+            Console.WriteLine($"\t\t\t\t\tCheck-in Time:     {checkInTime}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\t\t\t\t\t\t           Have a Pleasant Journey! :)       ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\t\t\t\t\t\t         Thank you for selecting  FLY-HIGH Airline Reservationa us! :)       ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------------------------------");
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
+            Environment.Exit(0);
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            int c;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\t(: WELCOME TO FLY-HIGH AIRLINE TICKETS :)");
+            Thread.Sleep(1700);
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tPAGE IS LOADING! PLEASE WAIT...");
+            Thread.Sleep(1700);
+            Console.Clear();
+
+            while (true)
+            {
+                Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tAdmin---> 1\n\n\t\t\t\t\t\t\t\tUser ---> 2");
+                Console.Write("\n\t\t\t\t\t\t\t\tEnter Your Choice:  ");
+                c = Convert.ToInt32(Console.ReadLine());
+                Thread.Sleep(1850);
+                Console.Clear();
+                if (c == 1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tLOADING ADMIN LOGIN PAGE! PLEASE WAIT :)");
+                    Thread.Sleep(1850);
+                    Console.Clear();
+                    {
+                        string m = "admin", p1 = "admin", n, p2;
+                        Console.Write("\n\n\n\n\n\n\t\t\t\t\t\t\t\tEnter Admin Name     : ");
+                        n = Console.ReadLine();
+                        Console.Write("");
+                        Console.Write("\n\n\t\t\t\t\t\t\t\tEnter Admin Password : ");
+                        p2 = Console.ReadLine();
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tLoading the page Please Wait :)");
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        if (p1 == p2 && n == m)
+                        {
+                            Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tYOU GOT ACCESS ENTER FLIGHT DETAILS");
+                            Thread.Sleep(1350);
+                            Console.Clear();
+                            A a = new A();
+                            a.FlightDetails();
+                            B b = new B();
+                            b.AdminFlightDetails();
+                        }
+                        else
+                        {
+                            Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tINVALID PASSWORD OR NAME\\n\n\n\n\n\n\t\t\t\t\t\t\t\tPLEASE TRY AGAIN");
+                            continue;
+                        }
+                    }
+                }
+                else if (c == 2)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tLOADING USER PAGE! PLEASE WAIT :)");
+                    Thread.Sleep(1850);
+                    Console.Clear();
+                    Console.WriteLine();
+                    Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tLOGIN ---> 1\n\n\t\t\t\t\t\t\t\tSign Up ---> 2");
+                    Console.Write("\n\t\t\t\t\t\t\t\tEnter Your Choice:  ");
+                    c = Convert.ToInt32(Console.ReadLine());
+                    Thread.Sleep(1850);
+                    Console.Clear();
+                    if (c == 1)
+                    {
+                        Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tPLEASE WAIT ! LOADING YOUR LOGIN PAGE");
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        UserLogin();
+                    }
+                    else if (c == 2)
+                    {
+                        Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tPLEASE WAIT !LOADING YOUR SIGN UP PAGE ");
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        string n, p1, p2;
+                        Console.Write("\n\n\n\n\n\n\t\t\t\t\t\t\t\tEnter your Mobile No  : ");
+
+                        n = Console.ReadLine();
+                        Console.Write("\n\n\t\t\t\t\t\t\t\tEnter your Password  : ");
+                        p1 = Console.ReadLine();
+                        p2 = p1;
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tYour Sign-In is Successful ");
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tPLEASE WAIT LOADING YOUR LOGIN PAGE");
+                        Thread.Sleep(1850);
+                        Console.Clear();
+                        UserLogin(mobileNumber: n, password: p1);
+                    }
+                }
+            }
+        }
+
+        public static void UserLogin(string mobileNumber = "", string password = "")
+        {
+        x1:
+            Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tUser Login");
+            string m = "9392475754", p1 = "rehan147", n, p2;
+            n = !string.IsNullOrEmpty(mobileNumber) ? mobileNumber : "9392475754";
+            p1 = !string.IsNullOrEmpty(password) ? password : "rehan147";
+            Console.Write("\n\t\t\t\t\t\t\t\tEnter your Mobile No: ");
+            n = Console.ReadLine();
+            Console.Write("\n\t\t\t\t\t\t\t\tEnter your Password : ");
+            p2 = Console.ReadLine();
+            Thread.Sleep(1850);
+            Console.Clear();
+            Console.WriteLine("\n\t\t\t\t\t\t\t\tLoading the page Please Wait :)");
+            Thread.Sleep(1850);
+            Console.Clear();
+            if (n == m && p2 == p1)
+            {
+                Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tLogin successful. Access granted.");
+                Thread.Sleep(1850);
+                Console.Clear();
+                B b = new B();
+                b.AdminFlightDetails();
+            }
+            else
+            {
+
+                Console.WriteLine("\n\n\n\n\n\n\t\t\t\t\t\t\t\tInvalid mobile number or password. Access denied.");
+                goto x1;
+            }
+        }
+    }
+}
